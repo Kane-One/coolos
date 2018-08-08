@@ -1,0 +1,19 @@
+version: '3'
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+services:
+
+### linux ##############################################
+    linux:
+      build:
+        context: ./linux
+      volumes:
+        - ../../:/home/myos
+      networks:
+        - frontend
+        - backend
