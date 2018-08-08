@@ -1,3 +1,5 @@
+;boot程序，仅显示hello world！
+
 org 0x7c00							;指定程序起始地址
 
 BaseofStack equ 0x7c00
