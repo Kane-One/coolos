@@ -79,20 +79,24 @@ OK，这样helloworld引导程序可以看懂了。代码和注释在`learning/h
 
 更多玩法参照 [x64-architecture](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/x64-architecture)。
 
-介绍下软盘的结构，《操作系统》里讲的不是很清楚，看的云里雾里。
+介绍下软盘的结构，《操作系统》里讲的不是很明白，看的云里雾里。
 
 ![image](https://raw.githubusercontent.com/Kane-One/myos/master/learning/res/softdisk.jpeg)
 
 以3.5英寸1.44MB的软盘为例，有18个扇面，80个磁道（磁轨），且双面都可读写，每一面有一个磁头。这样就形成`18 * 80 * 2 = 2880`个扇区。
 
-《操作系统》把扇面和扇区混为一谈，令人费解。
+《操作系统》把扇面和扇区混为一谈，难以理解。
 
 每个扇区的容量都是512个字节，所以一共有`512Byte * 2880 = 1.44MB`的容量。个人猜测可能是越靠近边缘的磁道越窄。
 
-扇面号（0到17），磁道号（0到79），磁头号（0和1）三个参数共同决定扇区号。
+扇面号（1到18），磁道号（0到79），磁头号（0和1）三个参数共同决定一个扇区号（0到2879）。
 
-了解这些，书中读取扇区的程序才读的通。
+那扇区号是怎么安排的呢？和想当然的不一样。它是先按磁道再按正反面交替排列，不是排完一面再排另一面。从扇区号有个公式可以计算出扇面号、磁道号和磁头号。
 
-另外需要了解一下[读取磁盘扇区的中断](http://www.ousob.com/ng/asm/ng79205.php)。
+《操作系统》中关于由扇区号计算出扇面号，磁道号和磁头号的计算公式有误。正确公式如下：
+
+![image](https://raw.githubusercontent.com/Kane-One/myos/master/learning/res/softdisk_formula.jpg)
+
+还需要了解下[读取磁盘扇区的中断](http://www.ousob.com/ng/asm/ng79205.php)。了解这些，书中读取扇区内容的程序才读的通。
 
 整个启动的代码都在`learning/helloworld/boot_loader.asm`里。
