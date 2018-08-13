@@ -48,15 +48,12 @@ Label_Start:
 	mov 	ax, StartBootMessage
 	mov 	bx, 13
 	call	Func_Print
-	jmp		Label_End
+	jmp		Label_Search_In_Root_Dir_Begin
 
 
 
 StartBootMessage:
 	db "Hello world! " 				;db表示定义字节类型变量（define byte），定义一个字符串
-
-StartBootMessage2:
-	db "What is up?" 				;db表示定义字节类型变量（define byte），定义一个字符串
 
 
 ;封装在当前光标处打印字符串程序，以便调用，调用前，ax存入字符串起始地址，bx存入字符串长度
@@ -123,7 +120,6 @@ Func_Print:
 	mov     es, ax
 	mov		ax, 1301h
 	mov		bx, 000fh
-	; mov		dx, 0000h
 
 	int     10h
 
@@ -255,16 +251,9 @@ Label_Goto_Next_Sector_In_Root_Dir:
 
 Label_No_LoaderBin:
 
-	mov		ax,		1301h
-	mov		bx,		008ch
-	mov		dx,		0100h
-	mov		cx,		21
-	push	ax
-	mov		ax,		ds
-	mov 	es,		ax
-	pop		ax
-	mov		bp,		NoLoaderMessage
-	int 	10h
+	mov 	ax, NoLoaderMessage
+	mov 	bx, 21
+	call Func_Print
 	jmp		$
 
 
@@ -354,7 +343,9 @@ Label_Go_On_Loading_File:
 
 
 Label_File_Loaded:
-
+	mov 	ax, LoaderFileFoundMessage
+	mov 	bx, 17
+	call Func_Print
 	jmp		$
 
 
@@ -363,10 +354,7 @@ SectorNo: 			dw 	0
 Odd:				db  0
 NoLoaderMessage:	db 	"Error: No Loader Found"
 LoaderFileName:		db 	"LOADER BIN", 0
-
-
-;结束地址
-Label_End:
+LoaderFileFoundMessage:	db "loader file found"
 
 
 
@@ -375,3 +363,6 @@ Label_Fill_Boot_Section:
 	times 510 - ($ - $$) db 0		;$表示本行地址，$$表示节起始地址，重复定义填满一个扇区
 	dw 0xaa55						;dw表示定义字类型变量（define word），以0x55 和 0xaa结尾标识这个扇区是一个引导扇区
 
+
+
+	times 1024 - ($ - $$) db 0		;$表示本行地址，$$表示节起始地址，重复定义填满一个扇区
