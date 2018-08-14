@@ -2,7 +2,7 @@
 
 org 0x7c00												;指定程序起始地址
 
-BaseOfStack 		equ 0x7fff
+BaseOfStack 		equ 0x7c00
 BaseOfExtraStack  	equ 0x7ec8
 BaseOfLoader 		equ 0x1000
 OffsetOfLoader 		equ 0x00
@@ -17,10 +17,10 @@ SectorBalance 				equ 17						;未知
 	jmp short Label_Start								;段内跳转到Label_start处执行
 	nop													;伪指令，啥也不干，这里应该只是为了凑个数，因为FAT12启动扇区格式为前3个字节为跳转指令
 
-	BS_OEMName 				db 'MyOS'					;生产商
+	BS_OEMName 				db '        '				;生产商，8个字节，不足以空格填充
 	BPB_BytesPerSec 		dw 512						;每个扇区512个字节
 	BPB_SecPerClus			db 1						;每簇1个扇区
-	BPB_RsvdSecCnt			db 1						;保留1个扇区，第一个扇区是启动扇区
+	BPB_RsvdSecCnt			dw 1						;保留1个扇区，第一个扇区是启动扇区
 	BPB_NumFATs				db 2						;两个FAT扇区
 	BPB_RootEntCnt			dw 224						;根目录可容纳的目录项数
 	BPB_TotalSec16			dw 2880						;总扇区数
@@ -30,11 +30,11 @@ SectorBalance 				equ 17						;未知
 	BPB_NumHeads			dw 2						;磁头数
 	BPB_HiddSec				dd 0						;隐藏扇区数
 	BPB_TotSec32			dd 0
-	BS_DrvNum				dd 0						;中断13（读取磁盘扇区）的驱动器号
-	BS_Reserved1			dd 0
-	BS_BootSig				dd 0x29						;扩展引导标志
+	BS_DrvNum				db 0						;中断13（读取磁盘扇区）的驱动器号
+	BS_Reserved1			db 0
+	BS_BootSig				db 0x29						;扩展引导标志
 	BS_VolID				dd 0						;卷序列号
-	BS_VolLab				db 'MyOS       '			;卷标，必须是11个字符，不足以空格填充
+	BS_VolLab				db '           '			;卷标，必须是11个字符，不足以空格填充
 	BS_FileSysType			db 'FAT12   '				;文件系统类型，必须是8个字符，不足填充空格
 
 
@@ -48,6 +48,7 @@ Label_Start:
 	mov 	ax, StartBootMessage
 	mov 	bx, 13
 	call	Func_Print
+	mov		word 	[SectorNo],		SectorNumOfRootDirStart
 	jmp		Label_Search_In_Root_Dir_Begin
 
 
@@ -185,9 +186,7 @@ Label_Go_On_Reading:
 	add		esp, 2							;恢复esp
 	pop 	bp 								;恢复bp
 	ret 									
-
-	mov		word 	[SectorNo],		SectorNumOfRootDirStart
-
+	
 
 Label_Search_In_Root_Dir_Begin:
 
@@ -195,15 +194,15 @@ Label_Search_In_Root_Dir_Begin:
 	cmp		word 	[RootDirSizeForLoop],		0
 	jz		Label_No_LoaderBin
 	dec 	word 	[RootDirSizeForLoop]
-	mov		ax,		0000h
+	mov		ax,		00h
 	mov		es,		ax
-	mov		bx,		BaseOfExtraStack				;缓存区设为扩展栈底地址
+	mov		bx,		8000h				;缓存区设为扩展栈底地址
 	; 下面两行准备好调用读取一个扇区内容的参数
 	mov		ax,		[SectorNo]
 	mov		cl,		1
 	call	Func_ReadOneSector
 	mov		si,		LoaderFileName					;把指向loader程序文件名的地址存在si寄存器
-	mov		di,		BaseOfExtraStack				;把di寄存器重置为扩展栈段地址
+	mov		di,		8000h				;把di寄存器重置为扩展栈段地址
 	cld 											;df标志位置0 应该是clear df的缩写
 	mov		dx,		10h 							;每个扇区512个字节，每个目录项占据32个字节，因此每个扇区有16个目录项
 
@@ -235,7 +234,7 @@ Label_Go_On:
 
 
 Label_Different:
-
+	
 	and		di,		0ffe0h							;因为每个文件项占32个内存单元，所以每个文件项起始地址都是二进制100000的整数倍，低5位清零后相当于回到文件项起始处
 	add		di,		20h								;前进32个内存单元，即下一个文件项开始
 	
@@ -252,7 +251,7 @@ Label_Goto_Next_Sector_In_Root_Dir:
 Label_No_LoaderBin:
 
 	mov 	ax, NoLoaderMessage
-	mov 	bx, 21
+	mov 	bx, 9
 	call Func_Print
 	jmp		$
 
@@ -344,18 +343,17 @@ Label_Go_On_Loading_File:
 
 Label_File_Loaded:
 	mov 	ax, LoaderFileFoundMessage
-	mov 	bx, 17
+	mov 	bx, 18
 	call Func_Print
-	jmp		$
+	jmp		BaseOfLoader:OffsetOfLoader
 
 
 RootDirSizeForLoop:	dw 	RootDirSectors
 SectorNo: 			dw 	0
 Odd:				db  0
-NoLoaderMessage:	db 	"Error: No Loader Found"
-LoaderFileName:		db 	"LOADER BIN", 0
-LoaderFileFoundMessage:	db "loader file found"
-
+NoLoaderMessage:	db 	"No Loader"
+LoaderFileName:		db 	"LOADER  BIN", 0
+LoaderFileFoundMessage:	db "loader file loaded"
 
 
 ;用0填满本扇区，并以55aa结尾代表这是一个启动扇区
@@ -363,6 +361,4 @@ Label_Fill_Boot_Section:
 	times 510 - ($ - $$) db 0		;$表示本行地址，$$表示节起始地址，重复定义填满一个扇区
 	dw 0xaa55						;dw表示定义字类型变量（define word），以0x55 和 0xaa结尾标识这个扇区是一个引导扇区
 
-
-
-	times 1474560 - ($ - $$) db 0		;$表示本行地址，$$表示节起始地址，重复定义填满一个扇区
+	times 1474560 - ($ - $$) db 0		; 填满1.44MB
