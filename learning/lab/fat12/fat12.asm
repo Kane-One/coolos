@@ -1,11 +1,11 @@
-;boot程序，FAT12文件系统驱动，载入loader.bin并执行
+;boot程序，FAT12文件系统
 
 org 0x7c00												;指定程序起始地址
 
 	jmp short Label_Start								;段内跳转到Label_start处执行
 	nop													;伪指令，啥也不干，这里应该只是为了凑个数，因为FAT12启动扇区格式为前3个字节为跳转指令
 
-	BS_OEMName 				db '        '				;生产商
+	BS_OEMName 				db '        '				;生产商，8个字节，不足以空格填充
 	BPB_BytesPerSec 		dw 512						;每个扇区512个字节
 	BPB_SecPerClus			db 1						;每簇1个扇区
 	BPB_RsvdSecCnt			dw 1						;保留1个扇区，第一个扇区是启动扇区
@@ -30,4 +30,4 @@ Label_Start:
 	times 510 - ($ - $$) db 0		;$表示本行地址，$$表示节起始地址，重复定义填满一个扇区
 	dw 0xaa55						;dw表示定义字类型变量（define word），以0x55 和 0xaa结尾标识这个扇区是一个引导扇区
 
-	times 1474560 - ($ - $$) db 0		;$表示本行地址，$$表示节起始地址，重复定义填满一个扇区
+	times 1474560 - ($ - $$) db 0		;用0填满1.44MB，作为可用区
