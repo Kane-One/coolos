@@ -34,3 +34,19 @@ sti
 
 
 
+
+
+; LABLE_GDT:      dd      0, 0
+; LABLE_DESC_CODE32:      dd      0x0000ffff,0x00cf9a00
+
+; GdtLen          equ     $ - LABLE_GDT
+; GdtPtr          dw      GdtLen - 1
+;                 dd      LABLE_GDT
+
+
+
+; SelectorData32  equ     LABLE_DESC_CODE32 - LABLE_GDT
+
+
+
+
