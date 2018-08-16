@@ -1,4 +1,4 @@
-;封装在当前光标处打印字符串程序，以便调用，调用前，ax存入字符串起始地址，bx存入字符串长度
+;封装在当前光标处打印字符串程序，以便调用，调用前，ax存入字符串起始地址的偏移地址，bx存入字符串长度
 Func_Print:
 ; 用 int 10h 03h 获取光标信息，用 int 10h 13h打印字符串，下面是这两个中段的用法
 
@@ -38,36 +38,32 @@ Func_Print:
 ;        Registers destroyed:      AX, SP, BP, SI, DI
 
 ;---------------------------------------------------------------------------------
-	;ax bx cx dx入栈保存
-
-	push	dx
 	push	cx
-	push	bx
+	push	dx
 	push	ax
-
+	push	bx
 	mov		ah, 03h
-	mov		bh, 0
-
-	int 	10h								;触发中断获取光标位置，此时dh=行号，dl=列号
-
-	pop		ax
+	mov		bh,	0
+	int		10h
 	pop		bx
+	pop		ax
 
-	push	bp
+	mov		cx,	bx
+	mov		bx,	cs
 	push	es
+	mov		es,	bx
+	push	bp
+	mov		bp,	ax
 
-	mov		cx, bx
-	mov		bp, ax 							;ES:BP指向字符串起始地址
-	mov		ax, ds
-	mov     es, ax
+	mov 	bx, 000fh					; bl = 0fh表示字体颜色绿
 	mov		ax, 1301h
-	mov		bx, 000fh
+	add		dh, 1
+	mov		dl, 0
+	int 	10h
 
-	int     10h
-
+	pop 	bp
 	pop		es
-	pop     bp
-	pop  	cx
 	pop		dx
+	pop		cx
 
-	ret  									;ret指令，栈顶字单元出栈给ip寄存器（指令指针寄存器），调用前栈中压入了调用完应当执行的指令地址，因此这里可以返回继续执行
+	ret
