@@ -121,8 +121,12 @@ LABLE_DESC_CODE32:      dd      0x0000ffff,0x00cf9a00   ; 从低到高是      F
 
                                                         ; 段限长 fffffh  单位是4k，所以先限长是4G
                                                         ; 段基地址 00000000h
-                                                        ; 偏移量
-LABEL_DESC_DATA32:      dd      0x0000ffff,0x00cf9200
+
+
+LABEL_DESC_DATA32:      dd      0x0000ffff,0x00cf9200   ; 从低到高      ffff 0000 0092 cf00 
+                                                        ; 从高到低      00 cf 92 00 00 00 ff ff
+                                                        ; 跟上个段描述符一样，只是type位是2h，表示可读写
+
 
 ; 定义全局描述表大小
 GdtLen          equ     $ - LABLE_GDT

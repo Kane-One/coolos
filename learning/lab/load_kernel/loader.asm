@@ -327,4 +327,4 @@ OffsetOfKernelFileCount: dw 0
 
 
 
-%include "switichmode.asm"
+%include "switchmode.asm"
