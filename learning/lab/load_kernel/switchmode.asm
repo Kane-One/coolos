@@ -102,8 +102,26 @@ no_support:
 ; 全局描述符表，每个段描述符64位（8个字节）
 
 LABLE_GDT:      dd      0, 0                            ; 第一个段描述符必须是0
-LABLE_DESC_CODE32:      dd      0x0000ffff,0x00cf9a00   ; 实际上是ffff 0000 009a cf00，
-                                                        ; 偏移量cf00h, 首字节线性地址0xff00009a
+LABLE_DESC_CODE32:      dd      0x0000ffff,0x00cf9a00   ; 从低到高是      FF FF 00 00 00 9A CF 00
+                                                        ; 从高到底是      00 cf 9a 00 00 00 ff ff  
+                                                        ; 按照代码段描述符的格式划分后得到
+                                                            Base:   00h
+                                                            G:      1b，段大小以4K为单位计
+                                                            B:      1b
+                                                            O:      0b
+                                                            AVI:    0b
+                                                            Limit:  fh
+                                                            1:      1b
+                                                            DPI:    00b
+                                                            S:      1b，表示普通代码或数据段
+                                                            TYPE:   ah，段权限为执行、可读
+                                                            Base:   00h
+                                                            Base:   0000h
+                                                            Limit:  ffffh
+
+                                                        ; 段限长 fffffh  单位是4k，所以先限长是4G
+                                                        ; 段基地址 00000000h
+                                                        ; 偏移量
 LABEL_DESC_DATA32:      dd      0x0000ffff,0x00cf9200
 
 ; 定义全局描述表大小
