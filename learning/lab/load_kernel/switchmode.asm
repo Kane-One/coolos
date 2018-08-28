@@ -9,8 +9,6 @@
     or      eax,    1           ; 最后一位置1
     mov     cr0,    eax         ; 开启保护模式
 
-    jmp     $
-
     jmp     dword   SelectorCode32:G0_TO_TMP_PROTECT
 
 
@@ -25,14 +23,12 @@ support_long_mode:
 ; The highest calling parameter is returned in EAX.
 
     mov     eax,    0x80000000
-    ; cupid     ; 不知道为什么nasm不支持这个指令，用下面一行代替
-    db      0a2h, 0fh
+    cpuid     ; 获取cpu的一些信息
     cmp     eax,    0x80000001
     setnb   al      ; set when not below，当上面的cmp不小于的时候al置1
     jb      support_long_mode_done
     mov     eax,    0x80000001
-    ; cupid
-    db      0a2h, 0fh
+    cpuid
     bt      edx,    29  ;执行上面cpuid后，edx第29位表示是否支持IA-32e模式，把该位赋值给cf标志位
     setc    al          ;当cf为1时al置1
 
@@ -52,15 +48,18 @@ G0_TO_TMP_PROTECT:
     mov     ds,     ax
     mov     es,     ax
     mov     fs,     ax
-    mov     es,     ax
+    mov     ss,     ax
     mov     esp,    7e00h
 
     call    support_long_mode
-    ; 如果支持长模式，会改变eax的高位值
+    ; 如果支持长模式，则eax为1，test后zf标志位为0
     test    eax,    eax
 
     jz      no_support          ; 相同表示eax还是原来的值，不支持
 
+
+
+    ; 设置页表项
 
     mov     dword   [0x90000],  0x91007
     mov     dword   [0x90800],  0x91007
@@ -87,16 +86,20 @@ G0_TO_TMP_PROTECT:
 
     mov     esp,    7e00h
 
+    mov     eax,    cr4
+    bts     eax,    5
+    mov     cr4,    eax
+
 
     mov     eax,    0x90000
     mov     cr3,    eax
-    mov     ecx,    0c000080h
+
+
+    mov     ecx,    0c0000080h
     rdmsr
 
     bts     eax,    8
     wrmsr
-
-
 
     mov     eax,    cr0
     bts     eax,    0
@@ -104,12 +107,12 @@ G0_TO_TMP_PROTECT:
     mov     cr0,    eax
 
 
-
+    ; jmp $
     jmp     SelectorCode64:OffsetOfKernelFile
 
 
 [SECTION gdt]
-
+[BITS 32]
 ; 全局描述符表，每个段描述符64位（8个字节）
 
 LABLE_GDT:      dd      0, 0                            ; 第一个段描述符必须是0
@@ -157,7 +160,6 @@ IDT_END:
 IDT_POINTER:
     dw      IDT_END - IDT - 1
     dd      IDT
-
 
 
 [SECTION gdt64]

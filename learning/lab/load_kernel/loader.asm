@@ -1,6 +1,6 @@
-org 10000h
+org 0x10000
 
-jmp Label_Start
+	jmp Label_Start
 
 
 BaseOfKernelFile        equ     0x00
@@ -35,51 +35,67 @@ SectorBalance 				equ 17						;未知
 	BS_FileSysType			db 'FAT12   '				;文件系统类型，必须是8个字符，不足填充空格
 
 
+RootDirSizeForLoop:	dw 	RootDirSectors
+SectorNo: 			dw 	0
+Odd:				db  0
+NoLoaderMessage:	db 	"No Kernel File"
+LoaderFileName:		db 	"KERNEL  BIN", 0
+LoaderFileFoundMessage:	db "Kernel File Found"
+LoaderFileLoadMessage:	db "Kernel File Loaded"
+LoaderStarting:		db "Loader Running"
+
+OffsetOfKernelFileCount: dd 0x100000
+
 %include "../include/print.asm"
 
-
-; [SECTION .s16]
-; [BITS 16]
+[SECTION .s16]
+[BITS 16]
 
 Label_Start:
 
-
 	mov 	ax, cs						;cs寄存器（代码段寄存器） -> ax寄存器 
 	mov 	ds, ax						;ax寄存器 -> ds寄存器（数据段寄存器）
+	mov		es, ax
+	mov		ax,	0x00
+	mov		ss,	ax
+	mov		sp, 0x7c00
 
+	mov		eax, dword [OffsetOfKernelFileCount]
 
-; A20引脚设为高电平，开启32位地址线
-in      al,     92h
-or      al,     00000010b
-out     92h,    al
+	push 	ax
+	; A20引脚设为高电平，开启32位地址线
+	in      al,     92h
+	or      al,     00000010b
+	out     92h,    al
+	pop		ax
 
-cli     ; 禁止中断
+	cli     ; 禁止中断
 
-db      0x66    ; 下面lgdt指令的前缀，表示32位
+	db      0x66    ; 下面lgdt指令的前缀，表示32位
 
-; LGDT/LIDT - 加载全局/中断描述符表格寄存器
-; 将源操作数中的值加载到全局描述符表格寄存器 (GDTR) 或中断描述符表格寄存器 (IDTR)。
-; 源操作数指定 6 字节内存位置，它包含全局描述符表格 (GDT) 或中断描述符表格 (IDT) 的基址（线性地址）与限制（表格大小，以字节计）。
-; 如果操作数大小属性是 32 位，则将 16 位限制（6 字节数据操作数的 2 个低位字节）与 32 位基址（数据操作数的 4 个高位字节）加载到寄存器。
-; 如果操作数大小属性是 16 位，则加载 16 位限制（2 个低位字节）与 24 位基址（第三、四、五字节）。这里，不使用操作数的高位字节，GDTR 或 IDTR 中基址的高位字节用零填充。
-; LGDT 与 LIDT 指令仅用在操作系统软件中；它们不用在应用程序中。在保护模式中，它们是仅有的能够直接加载线性地址（即，不是段相对地址）与限制的指令。
-lgdt    [GdtPtr]            ; 设置全局描述符表格寄存器 (GDTR) 地址
+	; LGDT/LIDT - 加载全局/中断描述符表格寄存器
+	; 将源操作数中的值加载到全局描述符表格寄存器 (GDTR) 或中断描述符表格寄存器 (IDTR)。
+	; 源操作数指定 6 字节内存位置，它包含全局描述符表格 (GDT) 或中断描述符表格 (IDT) 的基址（线性地址）与限制（表格大小，以字节计）。
+	; 如果操作数大小属性是 32 位，则将 16 位限制（6 字节数据操作数的 2 个低位字节）与 32 位基址（数据操作数的 4 个高位字节）加载到寄存器。
+	; 如果操作数大小属性是 16 位，则加载 16 位限制（2 个低位字节）与 24 位基址（第三、四、五字节）。这里，不使用操作数的高位字节，GDTR 或 IDTR 中基址的高位字节用零填充。
+	; LGDT 与 LIDT 指令仅用在操作系统软件中；它们不用在应用程序中。在保护模式中，它们是仅有的能够直接加载线性地址（即，不是段相对地址）与限制的指令。
+	lgdt    [GdtPtr]            ; 设置全局描述符表格寄存器 (GDTR) 地址
 
-mov     eax,    cr0
-or      eax,    1           ; 最后一位置1
-mov     cr0,    eax         ; 开启保护模式
+	mov     eax,    cr0
+	or      eax,    1           ; 最后一位置1
+	mov     cr0,    eax         ; 开启保护模式
 
-mov     ax,     SelectorData32
-mov     fs,     ax
-mov     eax,    cr0
-and     al,     11111110b
-mov     cr0,    eax         ; 关闭保护模式
+	mov     ax,     SelectorData32
+	mov     fs,     ax
+	mov     eax,    cr0
+	and     al,     11111110b
+	mov     cr0,    eax         ; 关闭保护模式
 
-sti     ; 开启中断
+	sti     ; 开启中断
 
 	mov 	ax, LoaderStarting
 	mov 	bx, 14
-	call Func_Print
+	call 	Func_Print
 
 	mov		word 	[SectorNo],		SectorNumOfRootDirStart
 	jmp     Label_Search_In_Root_Dir_Begin
@@ -182,7 +198,7 @@ Label_No_LoaderBin:
 
 	mov 	ax, NoLoaderMessage
 	mov 	bx, 14
-	call Func_Print
+	call 	Func_Print
 	jmp		$
 
 
@@ -235,6 +251,10 @@ Label_Even_2:
 
 Label_FileName_Found:
 
+	mov 	ax, LoaderFileFoundMessage
+	mov 	bx, 17
+	call 	Func_Print
+
 	mov		ax,		RootDirSectors
 	and		di,		0ffe0h
 	add		di,		01ah
@@ -252,25 +272,16 @@ Label_Go_On_Loading_File:
 
 	push 	ax
 	push	bx
-	mov		ah,		0eh
-	mov		al,		'.'
-	mov		bl,		0fh
-	int 	10h
+	mov		ah,	0eh
+	mov		al, '.'
+	mov		bl,	0fh
+	int		10h
 	pop		bx
 	pop		ax
 
 	mov		cl,		1
 	call	Func_ReadOneSector
 	pop		ax
-	call 	Func_GetFATEntry
-	cmp 	ax,		0fffh
- 	jz 		Label_File_Loaded
- 	push	ax
- 	mov		dx, 	RootDirSectors
- 	add		ax,		dx
- 	add		ax,		SectorBalance
- 	add		bx,		[BPB_BytesPerSec]
- 	jmp 	Label_Go_On_Loading_File
 
     push    cx
     push    eax
@@ -278,7 +289,7 @@ Label_Go_On_Loading_File:
     push    ds
     push    esi
 
-    mov     cx,     200h
+    mov     cx,     200h	; 512个字节
     mov     ax,     BaseOfKernelFile
     mov     edi,    dword       [OffsetOfKernelFileCount]
 
@@ -307,24 +318,31 @@ Label_Mov_Kernel:
     pop     eax
     pop     cx
 
+	call 	Func_GetFATEntry
+	cmp 	ax,		0fffh
+ 	jz 		Label_File_Loaded
+ 	push	ax
+ 	mov		dx, 	RootDirSectors
+ 	add		ax,		dx
+ 	add		ax,		SectorBalance
+ 	add		bx,		[BPB_BytesPerSec]
+ 	jmp 	Label_Go_On_Loading_File
+
+
 Label_File_Loaded:
-	mov 	ax, LoaderFileFoundMessage
+	mov 	ax, LoaderFileLoadMessage
 	mov 	bx, 18
-	call Func_Print
+	call 	Func_Print
 
+	mov		ax,		4f02h
+	mov		bx,		4180h
+	int		10h
 
-
-RootDirSizeForLoop:	dw 	RootDirSectors
-SectorNo: 			dw 	0
-Odd:				db  0
-NoLoaderMessage:	db 	"No Kernel File"
-LoaderFileName:		db 	"KERNEL  BIN", 0
-LoaderFileFoundMessage:	db "Kernel File Loaded"
-
-LoaderStarting:		db "Loader Running"
-
-OffsetOfKernelFileCount: dw 0
 
 
 
 %include "switchmode.asm"
+
+
+
+

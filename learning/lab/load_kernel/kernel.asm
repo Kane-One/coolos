@@ -1,1 +1,0 @@
-db 'this is kernel'

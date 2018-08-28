@@ -4,6 +4,9 @@ RUN apk add curl bash procps gcc g++ libc-dev gdb nasm
 
 RUN apk add dosfstools
 
+RUN apk add make
+
+COPY .bashrc /root/.bashrc
 
 
 
