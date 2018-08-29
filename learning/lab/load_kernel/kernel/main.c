@@ -2,6 +2,11 @@ void Start_Kernel(void){
 
     while(1)
     ;
+
+
+
+
+    
     // int *addr = (int *)0xffff800000a00000;
     // int i;
 

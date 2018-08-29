@@ -334,6 +334,12 @@ Label_File_Loaded:
 	mov 	bx, 18
 	call 	Func_Print
 
+	push	dx
+	mov		dx,	03f2h
+	mov		al,	0
+	out		dx, al
+	pop		dx
+
 	mov		ax,		4f02h
 	mov		bx,		4180h
 	int		10h

@@ -27,11 +27,10 @@ GDT_LIMIT: .word GDT_END - GDT_Table - 1
 GDT_BASE: .quad GDT_Table
 
 
-
 .globl IDT_Table
 
 IDT_Table:
-    .fill 512,8,0
+    .quad 0x0000000000000000
 
 IDT_END:
 
@@ -51,6 +50,44 @@ TSS64_END:
 TSS64_POINTER:
 TSS64_LIMIT: .word TSS64_END - TSS64_Table - 1
 TSS64_BASE: .quad TSS64_Table
+
+
+
+.align 8
+
+.org 0x1000
+
+__PML4E:
+    .quad 0x102007
+    .fill 255,8,0
+    .quad 0x102007
+    .fill 255,8,0
+
+
+.org 0x2000
+
+__PDPTE:
+    .quad 0x103003
+    .fill 511,8,0
+
+.org 0x3000
+
+__PDE:
+    .quad 0x000083
+    .quad 0x200083
+    .quad 0x400083
+    .quad 0x600083
+    .quad 0x800083
+    .quad 0xe0000083
+    .quad 0xe0200083
+    .quad 0xe0400083
+    .quad 0xe0600083
+    .quad 0xe0800083
+    .quad 0xe0a00083
+    .quad 0xe0c00083
+    .quad 0xe0e00083
+    .fill 499,8,0
+
 
 
 .section .text
@@ -103,41 +140,3 @@ entry64:
 
 go_to_kernel:
     .quad Start_Kernel
-
-
-
-
-.align 8
-
-.org 0x1000
-
-__PML4E:
-    .quad 0x102007
-    .fill 255,8,0
-    .quad 0x102007
-    .fill 255,8,0
-
-
-.org 0x2000
-
-__PDPTE:
-    .quad 0x103003
-    .fill 511,8,0
-
-.org 0x3000
-
-__PDE:
-    .quad 0x000083
-    .quad 0x200083
-    .quad 0x400083
-    .quad 0x600083
-    .quad 0x800083
-    .quad 0xe0000083
-    .quad 0xe0200083
-    .quad 0xe0400083
-    .quad 0xe0600083
-    .quad 0xe0800083
-    .quad 0xe0a00083
-    .quad 0xe0c00083
-    .quad 0xe0e00083
-    .fill 499,8,0
