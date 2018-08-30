@@ -356,7 +356,7 @@ cpuid: family=6,model=0x1a,stepping=5,vendor_string="GenuineIntel",brand_string=
 # used all allocated host memory and wants more.
 #
 #=======================================================================
-memory: guest=512, host=256
+#memory: guest=512, host=256
 
 #=======================================================================
 # ROMIMAGE:
@@ -1268,3 +1268,5 @@ speaker: enabled=1, mode=sound
 #megs: 32
 #megs: 16
 #megs: 8
+
+megs: 256
