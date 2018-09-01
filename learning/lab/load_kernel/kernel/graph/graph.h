@@ -7,3 +7,5 @@ void print_8x8(char map[], unsigned int row_start, int column_start, int color);
 void print_char(char letter, unsigned int row, int column, int color);
 
 void print_ascii(int ascii_index, unsigned int row, int column, int color);
+
+void print_string(char *string, unsigned int row, int column, int color);

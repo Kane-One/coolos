@@ -189,3 +189,15 @@ void print_char(char letter, unsigned int row, int column, int color)
 {
     print_ascii(letter, row, column, color);
 }
+
+void print_string(char *string, unsigned int row, int column, int color)
+{
+    int i = 0;
+
+    while (string[i] != '\0')
+    {
+        print_char(string[i], row, column, color);
+        column += 10;
+        i++;
+    }
+}
