@@ -60,8 +60,6 @@ Label_Start:
 	mov		ss,	ax
 	mov		sp, 0x7c00
 
-	mov		eax, dword [OffsetOfKernelFileCount]
-
 	push 	ax
 	; A20引脚设为高电平，开启32位地址线
 	in      al,     92h
@@ -270,18 +268,12 @@ Label_FileName_Found:
 
 Label_Go_On_Loading_File:
 
-	push 	ax
-	push	bx
-	mov		ah,	0eh
-	mov		al, '.'
-	mov		bl,	0fh
-	int		10h
-	pop		bx
-	pop		ax
-
 	mov		cl,		1
 	call	Func_ReadOneSector
 	pop		ax
+
+
+
 
     push    cx
     push    eax
@@ -318,6 +310,8 @@ Label_Mov_Kernel:
     pop     eax
     pop     cx
 
+	
+
 	call 	Func_GetFATEntry
 	cmp 	ax,		0fffh
  	jz 		Label_File_Loaded
@@ -325,7 +319,7 @@ Label_Mov_Kernel:
  	mov		dx, 	RootDirSectors
  	add		ax,		dx
  	add		ax,		SectorBalance
- 	add		bx,		[BPB_BytesPerSec]
+ 	; add		bx,		[BPB_BytesPerSec]
  	jmp 	Label_Go_On_Loading_File
 
 

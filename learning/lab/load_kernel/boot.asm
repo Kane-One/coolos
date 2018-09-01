@@ -248,17 +248,10 @@ Label_FileName_Found:
 
 Label_Go_On_Loading_File:
 
-	push 	ax
-	push	bx
-	mov		ax, Dot
-	mov		bx,	1
-	call	Func_Print
-	pop		bx
-	pop		ax
-
 	mov		cl,		1
 	call	Func_ReadOneSector
 	pop		ax
+	
 	call 	Func_GetFATEntry
 	cmp 	ax,		0fffh
  	jz 		Label_File_Loaded

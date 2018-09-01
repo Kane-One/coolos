@@ -1269,4 +1269,4 @@ speaker: enabled=1, mode=sound
 #megs: 16
 #megs: 8
 
-megs: 256
+megs: 512

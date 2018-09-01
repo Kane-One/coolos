@@ -1,89 +1,3 @@
-.section .data
-
-//=== GDT_Table
-.globl GDT_Table
-
-GDT_Table:
-    .quad   0x0000000000000000
-    .quad   0x0020980000000000
-    .quad   0x0000920000000000
-    .quad   0x0020f80000000000
-    .quad   0x0000f20000000000
-    .quad   0x00cf9a000000ffff
-    .quad   0x00cf92000000ffff
-    .fill   10,8,0
-
-GDT_END:
-
-GDT_POINTER:
-GDT_LIMIT:      .word   GDT_END - GDT_Table - 1
-GDT_BASE:       .quad   GDT_Table + 1
-
-//=== IDT_Table
-.globl IDT_Table
-
-IDT_Table:
-    .quad   0x0000000000000000
-
-IDT_END:
-
-IDT_POINTER:
-IDT_LIMIT:      .word   IDT_END - IDT_Table - 1
-IDT_BASE:       .quad   IDT_Table + 1
-
-//=== TSS64_Table
-
-.globl TSS64_Table
-
-TSS64_Table:
-    .quad   0x0000000000000000
-
-TSS64_END:
-
-TSS64_POINTER:
-TSS64_LIMIT:      .word   TSS64_END - TSS64_Table - 1
-TSS64_BASE:       .quad   TSS64_Table + 1
-
-
-//=== init pages
-.align 8
-
-.org 0xF60
-
-__PML4E:
-    .quad   0x102007
-    .fill   255,8,0
-    .quad   0x102007
-    .fill   255,8,0
-
-
-.org 0x2F60
-
-__PDPTE:
-    .quad   0x103003
-    .fill   511,8,0
-
-.org 0x3F60
-
-__PDE:
-    .quad   0x000083
-    .quad   0x200083
-    .quad   0x400083
-    .quad   0x600083
-    .quad   0x800083
-    .quad   0xe0000083
-    .quad   0xe0200083
-    .quad   0xe0400083
-    .quad   0xe0600083
-    .quad   0xe0800083
-    .quad   0xe0a00083
-    .quad   0xe0c00083
-    .quad   0xe0e00083
-    .fill   499,8,0
-
-
-
-
 .section .text
 .globl _start
 
@@ -108,9 +22,7 @@ _start:
     mov     %ax,    %ss
 
     movq    $0x7e00,    %rsp
-
-    movq    $0x100158,  %rax
-//   movq    __PML4E(%rip),  %rax
+    movq    $0x101000,  %rax
 
     movq    %rax,       %cr3
     movq    switch_seg(%rip),   %rax
@@ -124,10 +36,10 @@ switch_seg:
 
 entry64:
     movq    $0x10,  %rax
-    movq    %rax,   %ds
-    movq    %rax,   %es
-    movq    %rax,   %gs
-    movq    %rax,   %ss
+//    movq    %rax,   %ds
+//    movq    %rax,   %es
+//    movq    %rax,   %gs
+//    movq    %rax,   %ss
     movq    $0xffff800000007e00,    %rsp
     movq    go_to_kernel(%rip),     %rax
     pushq   $0x08
@@ -136,4 +48,81 @@ entry64:
 
 go_to_kernel:
     .quad   Start_Kernel
+
+
+end_of_code:
+
+.section .data
+
+__PML4E:
+    .quad   0x102007
+    .fill   255,8,0
+    .quad   0x102007
+    .fill   255,8,0
+
+__PDPTE:
+    .quad   0x103003
+    .fill   511,8,0
+
+__PDE:
+    .quad   0x000083
+    .quad   0x200083
+    .quad   0x400083
+    .quad   0x600083
+    .quad   0x800083
+    .quad   0xe0000083
+    .quad   0xe0200083
+    .quad   0xe0400083
+    .quad   0xe0600083
+    .quad   0xe0800083
+    .quad   0xe0a00083
+    .quad   0xe0c00083
+    .quad   0xe0e00083
+    .fill   499,8,0
+
+
+//=== GDT_Table
+.globl GDT_Table
+
+GDT_Table:
+    .quad   0x0000000000000000
+    .quad   0x0020980000000000
+    .quad   0x0000920000000000
+    .quad   0x0020f80000000000
+    .quad   0x0000f20000000000
+    .quad   0x00cf9a000000ffff
+    .quad   0x00cf92000000ffff
+    .fill   10,8,0
+
+GDT_END:
+
+GDT_POINTER:
+GDT_LIMIT:      .word   GDT_END - GDT_Table - 1
+GDT_BASE:       .quad   GDT_Table
+
+//=== IDT_Table
+.globl IDT_Table
+
+IDT_Table:
+    .quad   0x0000000000000000
+
+IDT_END:
+
+IDT_POINTER:
+IDT_LIMIT:      .word   IDT_END - IDT_Table - 1
+IDT_BASE:       .quad   IDT_Table
+
+//=== TSS64_Table
+
+.globl TSS64_Table
+
+TSS64_Table:
+    .quad   0x0000000000000000
+
+TSS64_END:
+
+TSS64_POINTER:
+TSS64_LIMIT:      .word   TSS64_END - TSS64_Table - 1
+TSS64_BASE:       .quad   TSS64_Table
+
 
