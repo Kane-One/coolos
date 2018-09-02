@@ -335,7 +335,7 @@ Label_File_Loaded:
 	pop		dx
 
 	mov		ax,		4f02h
-	mov		bx,		4180h
+	mov		bx,		4143h
 	int		10h
 
 

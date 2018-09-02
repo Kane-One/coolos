@@ -17,6 +17,11 @@ SECTIONS
         *(.data)
     }
 
+    .rodata :
+    {
+        *(.rodata)
+    }
+
     .bss :
     {
         _bss = .;

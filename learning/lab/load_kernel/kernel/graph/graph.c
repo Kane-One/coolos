@@ -1,6 +1,4 @@
-// 线性地址0xffff800000000000  代表物理地址 0
-// 线性地址0xffff800000a00000  代表屏幕地址 0
-long base_addr = 0xffff800000000000;
+#include "graph.h"
 
 char font8x8_basic[128][8] = {
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // U+0000 (nul)
@@ -135,9 +133,9 @@ char font8x8_basic[128][8] = {
 
 void print_pixel(unsigned int row, int column, int color)
 {
-    int column_total = 1440;
+    int column_total = PIXEL_COLUMN_TOTAL;
     int pixel_index = column_total * (row - 1) + column;
-    long memory_address = base_addr + 0xa00000 + pixel_index * 4;
+    long memory_address = PIXEL_BASE_ADDRESS + pixel_index * 4;
     int *addr = (int *)memory_address;
     *addr = color;
 }
@@ -146,7 +144,7 @@ void print_line(unsigned int row, unsigned int color)
 {
     int i;
 
-    for (i = 0; i < 1440; i++)
+    for (i = 0; i < PIXEL_COLUMN_TOTAL; i++)
     {
         print_pixel(row, i, color);
     }
@@ -199,5 +197,18 @@ void print_string(char *string, unsigned int row, int column, int color)
         print_char(string[i], row, column, color);
         column += 10;
         i++;
+    }
+}
+
+void set_screen_color(int color)
+{
+    int i;
+    int *addr = (int *)PIXEL_BASE_ADDRESS;
+
+
+    for (i = 0; i < PIXEL_TOTAL; i++)
+    {
+        *addr = color;
+        addr++;
     }
 }

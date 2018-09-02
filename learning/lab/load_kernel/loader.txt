@@ -273,7 +273,7 @@
 0000026D  EE                out dx,al
 0000026E  5A                pop dx
 0000026F  B8024F            mov ax,0x4f02
-00000272  BB8041            mov bx,0x4180
+00000272  BB4341            mov bx,0x4143
 00000275  CD10              int 0x10
 00000277  FA                cli
 00000278  660F01169803      o32 lgdt [0x398]
