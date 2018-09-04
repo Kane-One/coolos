@@ -1,4 +1,4 @@
-#ifndef PIXEL_BASE_ADDR
+#ifndef PIXEL_BASE_ADDRESS
 
 // 线性地址0xffff800000000000  代表物理地址 0
 // 线性地址0xffff800000a00000  代表屏幕地址 0
