@@ -105,6 +105,7 @@ GDT_BASE:       .quad   GDT_Table
 
 IDT_Table:
     .quad   0x0000000000000000
+    .quad   0x0000000000000000
 
 IDT_END:
 
