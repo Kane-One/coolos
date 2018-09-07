@@ -205,10 +205,30 @@ void set_screen_color(int color)
     int i;
     int *addr = (int *)PIXEL_BASE_ADDRESS;
 
-
     for (i = 0; i < PIXEL_TOTAL; i++)
     {
         *addr = color;
         addr++;
     }
+}
+
+void n2s(char *s, long n)
+{
+    int i = 0;
+    int j = 0;
+    char tmp;
+    do
+    {
+        s[i] = n % 10 + '0';
+        i++;
+    } while ((n /= 10) > 0);
+
+    for (; j < i / 2; j++)
+    {
+        tmp = s[j];
+        s[j] = s[i - j - 1];
+        s[i - j - 1] = tmp;
+    }
+
+    s[i] = '\0';
 }

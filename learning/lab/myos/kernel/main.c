@@ -24,15 +24,14 @@ void Start_Kernel(void)
     // 触发测试中断
     __asm__("int $33");
 
-    // 触发一个除法错误
-    int a = 10;
-    int b = 0;
-    int c = 0;
-    c = a / b;
+    int n = 2345;
+
+    char *s;
+
+    n2s(s, n);
+
+    print_string(s, 70, 10, 0x839496);
 
     while (1)
         ;
 }
-
-
-

@@ -634,7 +634,7 @@ private_colormap: enabled=0
 # The optional parameter 'write_protected' can be used to control the media
 # write protect switch. By default it is turned off.
 #=======================================================================
-floppya: 1_44=/Users/kane/Work/myos/learning/lab/load_kernel/boot.img, status=inserted
+floppya: 1_44=/Users/kane/Work/myos/learning/lab/myos/boot/boot.img, status=inserted
 #floppya: image=../1.44, status=inserted
 #floppya: 1_44=/dev/fd0H1440, status=inserted
 #floppya: 1_2=../1_2, status=inserted
