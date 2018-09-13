@@ -1,6 +1,8 @@
-#ifndef KERNEL_CS
+#ifndef MYOS_IDT
 
-typedef unsigned long size_t;
+#define MYOS_IDT
+
+#define IDT_BASE (BASE_ADDRESS + 0x104092)
 
 #define KERNEL_CS 8
 
@@ -49,8 +51,6 @@ struct idt_data
     struct idt_bits bits;
     const void *addr;
 };
-
-void *memcpy(void *dest, const void *src, size_t n);
 
 void idt_init_desc(gate_desc *gate, const struct idt_data *d);
 void set_intr_gate(int n, const void *addr);

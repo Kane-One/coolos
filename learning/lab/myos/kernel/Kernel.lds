@@ -7,19 +7,31 @@ SECTIONS
 
     .text :
     {
+        _text = .;
         *(.text)
+        _etext = .;
     }
 
     . = 0x101000;
 
     .data :
     {
+        _data = .;
         *(.data)
+        _edata = .;
     }
 
     .rodata :
     {
+        _rodata = .;
         *(.rodata)
+        _erodata = .;
+    }
+
+    . = ALIGN(32768);
+
+    .data.init_task : {
+        *(.data.init_task)
     }
 
     .bss :

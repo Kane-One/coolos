@@ -1,4 +1,5 @@
-#include "graph.h"
+#include "video.h"
+#include "../memory/memory.h"
 
 char font8x8_basic[128][8] = {
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // U+0000 (nul)
@@ -131,11 +132,27 @@ char font8x8_basic[128][8] = {
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}  // U+007F
 };
 
+screen_t my_screen;
+
+void init_screen()
+{
+    my_screen.font_size = 8;
+    my_screen.position_x = 0;
+    my_screen.position_y = 0;
+    
+    set_screen_color(0x022b35);
+}
+
 void set_pixel(unsigned int row, int column, int color)
 {
     int column_total = PIXEL_COLUMN_TOTAL;
     int pixel_index = column_total * (row - 1) + column;
+
     long memory_address = PIXEL_BASE_ADDRESS + pixel_index * 4;
+    if (memory_address > PIXEL_MAX_ADDRESS)
+    {
+        return;
+    }
     int *addr = (int *)memory_address;
     *addr = color;
 }
@@ -150,7 +167,7 @@ void print_line(unsigned int row, unsigned int color)
     }
 }
 
-void print_8x8(char map[], unsigned int row_start, int column_start, int color)
+void print_8x8(char map[8], unsigned int row_start, int column_start, int color)
 {
     int i, j;
     int row, column;
@@ -231,4 +248,36 @@ void n2s(char *s, long n)
     }
 
     s[i] = '\0';
+}
+
+char read_bit(long n, int bit)
+{
+    n = n >> bit;
+    n = n & 1;
+
+    return (char)n;
+}
+
+void b2s(char *s, long n, int size)
+{
+    int i = 0;
+
+    char m = 0;
+
+    for (; i < size; i++)
+    {
+        m = read_bit(n, size - i - 1);
+        s[i] = m + '0';
+    }
+
+    s[size] = '\0';
+}
+
+void printl(char *s)
+{
+    // 0x839496
+    int row = my_screen.position_y;
+    my_screen.position_y += 12;
+
+    print_string(s, row, 10, 0xffffff);
 }

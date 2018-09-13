@@ -10,5 +10,5 @@ cp loader.bin tmp
 cp ../kernel/kernel.bin tmp  
 sync  
 umount tmp
-hdiutil detach /dev/disk2
+hdiutil detach /dev/disk3
 rm -rf tmp

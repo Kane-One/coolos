@@ -2,8 +2,8 @@
 all: system
 	objcopy -I elf64-x86-64 -S -R ".eh_frame" -R ".comment" -O binary system kernel.bin
 
-system: head.o main.o graph.o idt.o
-	ld -b elf64-x86-64 -o system head.o main.o graph.o idt.o -T Kernel.lds
+system: head.o main.o cpu.o memory.o video.o idt.o apic.o
+	ld -b elf64-x86-64 -o system head.o main.o cpu.o memory.o video.o idt.o apic.o -T Kernel.lds
 	objdump -D system > system.txt
 	
 head.o:	head.S
@@ -13,11 +13,20 @@ head.o:	head.S
 main.o: main.c
 	gcc -mcmodel=large -fno-builtin -m64 -c main.c
 
-graph.o: graph/graph.c
-	gcc -mcmodel=large -fno-builtin -m64 -c graph/graph.c
+cpu.o: cpu/cpu.c
+	gcc -mcmodel=large -fno-builtin -m64 -c cpu/cpu.c
 
-idt.o: idt.c
-	gcc -mcmodel=large -fno-builtin -fno-stack-protector -m64 -c idt.c
+video.o: video/video.c
+	gcc -mcmodel=large -fno-builtin -m64 -c video/video.c
+
+memory.o: memory/memory.c
+	gcc -mcmodel=large -fno-builtin -m64 -c memory/memory.c
+
+idt.o: idt/idt.c
+	gcc -mcmodel=large -fno-builtin -m64 -c idt/idt.c
+
+apic.o: apic/apic.c
+	gcc -mcmodel=large -fno-builtin -m64 -c apic/apic.c
 
 .PHONY : clean
 clean:
