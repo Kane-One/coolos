@@ -187,7 +187,7 @@
 #cpu: model=core2_penryn_t9600, count=1, ips=50000000, reset_on_triple_fault=1, ignore_bad_msrs=1, msrs="msrs.def"
 #cpu: cpuid_limit_winnt=0
 
-cpu: model=corei7_haswell_4770, count=1:1:1, ips=4000000, quantum=16, cpuid_limit_winnt=0, ignore_bad_msrs=1, MWAIT_IS_NOP=0,msrs="msrs.def"
+#cpu: model=corei7_haswell_4770, count=1:1:1, ips=4000000, quantum=16, cpuid_limit_winnt=0, ignore_bad_msrs=1, MWAIT_IS_NOP=0,msrs="msrs.def"
 
 
 #=======================================================================
@@ -336,7 +336,8 @@ cpu: model=corei7_haswell_4770, count=1:1:1, ips=4000000, quantum=16, cpuid_limi
 #cpuid: family=6, model=0x1a, stepping=5
 
 
-cpuid: x86_64=1,level=6,mmx=1,sep=1,aes=1,movbe=1,xsave=1,sha=1,movbe=1,adx=1,xsaveopt=1,avx_f16c=1,avx_fma=1,bmi=BMI2,pcid=1,fsgsbase=1,smep=1,smap=1,mwait=1,vmx=1
+cpuid: x86_64=1,level=6,mmx=1,sep=1,simd=avx2,aes=1
+cpuid: movbe=1,xsave=1,sha=1,movbe=1,adx=1,xsaveopt=1,avx_f16c=1,avx_fma=1,bmi=bmi2,pcid=1,fsgsbase=1,smep=1,smap=1,mwait=1,vmx=1
 cpuid: apic=x2apic,family=6,model=0x1a,stepping=5,vendor_string="GenuineIntel",brand_string="Intel(R) Core(TM) i7-4770 CPU(Haswell)"
 
 #=======================================================================

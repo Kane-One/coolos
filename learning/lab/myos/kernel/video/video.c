@@ -279,5 +279,5 @@ void printl(char *s)
     int row = my_screen.position_y;
     my_screen.position_y += 12;
 
-    print_string(s, row, 10, 0xffffff);
+    print_string(s, row, 10, 0x819597);
 }

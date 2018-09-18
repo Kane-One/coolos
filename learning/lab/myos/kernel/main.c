@@ -5,8 +5,13 @@
 #include "memory/memory.h"
 #include "cpu/cpu.h"
 
-void Start_Kernel(void)
-{
+
+void die(char *msg) {
+    printl(msg);
+    while (1);
+}
+
+void Start_Kernel(void) {
     // 设置IDT
     set_up_idt();
 
@@ -20,32 +25,27 @@ void Start_Kernel(void)
     // 触发测试中断
     __asm__("int $33");
 
-    if (enable_lapic() < 0)
-    {
-        printl("Failed to enable Local APIC");
-    }
-    else
-    {
-        printl("Local APIC enabled...");
+    if (enable_x2apic() < 0) {
+        die("Failed to enable X2APIC mode");
+    } else {
+        printl("X2APIC mode enabled...");
     }
 
-    print_cpuid(1, 0);
-    printl("------");
-    
-    printl("802:");
-    print_msr(0x802);
-    
-    printl("803:");
-    print_msr(0x803);
-    // if (disable_eoi() < 0)
-    // {
-    //     printl("Failed to disable EOI");
-    // }
-    // else
-    // {
-    //     printl("EOI disabled...");
-    // }
+    if (enable_software_lapic() < 0) {
+        die("Failed to enable APIC software");
+    } else {
+        printl("APIC software enabled, EOI disabled...");
+    }
 
-    while (1)
-        ;
+    disable_lvt();
+    printl("LVT all disabled");
+
+    disable_8259a();
+    printl("8259a disabled");
+
+    setup_keyboard();
+
+    printl("");
+    die("OS has nothing to do now.");
+
 }

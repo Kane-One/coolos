@@ -49,10 +49,9 @@ entry64:
 go_to_kernel:
     .quad   Start_Kernel
 
-
 end_of_code:
 
-.section .data
+    .org    0x1000
 
 __PML4E:
     .quad   0x102007

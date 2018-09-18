@@ -12,7 +12,7 @@ SECTIONS
         _etext = .;
     }
 
-    . = 0x101000;
+    . = ALIGN(8);
 
     .data :
     {
