@@ -6,4 +6,7 @@
 
 typedef unsigned long size_t;
 
+extern unsigned int
+
+
 #endif

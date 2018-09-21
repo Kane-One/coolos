@@ -8,10 +8,14 @@
 
 void die(char *msg) {
     printl(msg);
-    while (1);
+
+    while (1) {
+        asm("hlt");
+    }
 }
 
 void Start_Kernel(void) {
+
     // 设置IDT
     set_up_idt();
 
@@ -23,27 +27,15 @@ void Start_Kernel(void) {
     printl("");
 
     // 触发测试中断
-    __asm__("int $33");
+//    __asm__("int $5");
 
-    if (enable_x2apic() < 0) {
-        die("Failed to enable X2APIC mode");
-    } else {
-        printl("X2APIC mode enabled...");
+    // 初始化x2apic
+    if (init_x2apic() < 0) {
+        die("");
     }
-
-    if (enable_software_lapic() < 0) {
-        die("Failed to enable APIC software");
-    } else {
-        printl("APIC software enabled, EOI disabled...");
-    }
-
-    disable_lvt();
-    printl("LVT all disabled");
-
-    disable_8259a();
-    printl("8259a disabled");
 
     setup_keyboard();
+
 
     printl("");
     die("OS has nothing to do now.");

@@ -13,5 +13,8 @@ void *memcpy(void *dest, const void *src, size_t n);
 
 void *malloc(unsigned int n);
 
+long phy_to_virt(long n);
+
+long get_gdt();
 
 #endif

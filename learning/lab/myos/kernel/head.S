@@ -103,7 +103,7 @@ GDT_BASE:       .quad   GDT_Table
 .globl IDT_Table
 
 IDT_Table:
-    .fill 16 * 34
+    .fill 16 * 256
 
 IDT_END:
 
