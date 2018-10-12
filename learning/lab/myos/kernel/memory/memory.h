@@ -15,6 +15,8 @@ void *malloc(unsigned int n);
 
 long phy_to_virt(long n);
 
-long get_gdt();
+long long get_gdt();
+
+
 
 #endif

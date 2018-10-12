@@ -26,8 +26,17 @@ void Start_Kernel(void) {
     printl("MyOS is running...");
     printl("");
 
+    long long gdt = get_gdt();
+
+    char *s = (char *) malloc(32);
+
+    n2s(s, gdt);
+
+    printl(s);
+    die("OS has nothing to do now.");
+
     // 触发测试中断
-//    __asm__("int $5");
+    __asm__("int $5");
 
     // 初始化x2apic
     if (init_x2apic() < 0) {

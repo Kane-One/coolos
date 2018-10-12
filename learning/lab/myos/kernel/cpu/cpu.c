@@ -56,7 +56,7 @@ void rdmsr(unsigned long *rax, unsigned long *rcx)
         : "memory");
 }
 
-void print_msr(int c)
+void print_msr(unsigned long c)
 {
     char *s = (char *)malloc(65);
     unsigned long *rax = (unsigned long *)malloc(8);

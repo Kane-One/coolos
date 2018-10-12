@@ -14,7 +14,7 @@ void idt_init_desc(gate_desc *gate, const struct idt_data *d) {
     gate->reserved = 0;
 }
 
-void set_intr_gate(int n, const void *addr) {
+void set_intr_gate(unsigned int n, const void *addr) {
     // 准备中断段描述符数据
     struct idt_data *data = (struct idt_data *) malloc(sizeof(struct idt_data));
     gate_desc *gate = (gate_desc *) malloc(sizeof(gate_desc));
@@ -37,13 +37,6 @@ void set_intr_gate(int n, const void *addr) {
     memcpy(idt, gate, 16);
 }
 
-void test_int(void) {
-    printl("Testing interrupt works fine");
-}
-
-void div_error(void) {
-    printl("Div error detected.");
-}
 
 void tmp_int(void) {
     printl("Unhandled error");
@@ -287,7 +280,8 @@ void set_up_idt(void) {
     set_intr_gate(55, interrupt_handle_55);
     set_intr_gate(56, interrupt_handle_56);
 
-    int i;
+    unsigned int i;
+
     for (i = 57; i < 256; i++) {
         set_intr_gate(i, tmp_int);
     }

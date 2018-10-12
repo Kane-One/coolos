@@ -3,10 +3,7 @@
 
 #define BASE_ADDRESS 0xffff800000000000
 
-
 typedef unsigned long size_t;
-
-extern unsigned int
 
 
 #endif

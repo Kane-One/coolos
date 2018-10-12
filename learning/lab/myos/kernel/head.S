@@ -24,7 +24,7 @@ _start:
     movq    $0x7e00,    %rsp
     movq    $0x101000,  %rax
 
-    movq    %rax,       %cr3
+        movq    %rax,       %cr3
     movq    switch_seg(%rip),   %rax
     pushq   $0x08
     pushq   %rax
@@ -55,6 +55,8 @@ end_of_code:
 
 __PML4E:
     .quad   0x102007
+    // 00010000 0010 0000 00000111
+    // 00010000 0010 0000 00000000
     .fill   255,8,0
     .quad   0x102007
     .fill   255,8,0

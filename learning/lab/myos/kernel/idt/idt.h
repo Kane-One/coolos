@@ -53,7 +53,7 @@ struct idt_data
 };
 
 void idt_init_desc(gate_desc *gate, const struct idt_data *d);
-void set_intr_gate(int n, const void *addr);
+void set_intr_gate(unsigned int n, const void *addr);
 
 void set_up_idt(void);
 

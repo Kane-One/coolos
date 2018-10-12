@@ -8,6 +8,6 @@ void get_cpuid(unsigned int *a, unsigned int *b, unsigned int *c, unsigned int *
 
 void print_cpuid(int a, int c);
 void rdmsr(unsigned long *rax, unsigned long *rcx);
-void print_msr(int c);
+void print_msr(unsigned long c);
 
 #endif

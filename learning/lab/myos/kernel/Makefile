@@ -1,4 +1,5 @@
-	
+CFLAGS=-fno-stack-protector -mcmodel=large -fno-builtin -m64 -c
+
 all: system
 	objcopy -I elf64-x86-64 -S -R ".eh_frame" -R ".comment" -O binary system kernel.bin
 
@@ -11,23 +12,24 @@ head.o:	head.S
 	as --64 -o head.o head.p
 
 main.o: main.c
-	gcc -mcmodel=large -fno-builtin -m64 -c main.c
+	gcc ${CFLAGS} main.c
 
 cpu.o: cpu/cpu.c
-	gcc -mcmodel=large -fno-builtin -m64 -c cpu/cpu.c
+	gcc ${CFLAGS} cpu/cpu.c
 
 video.o: video/video.c
-	gcc -mcmodel=large -fno-builtin -m64 -c video/video.c
+	gcc ${CFLAGS} video/video.c
 
 memory.o: memory/memory.c
-	gcc -mcmodel=large -fno-builtin -m64 -c memory/memory.c
+	gcc ${CFLAGS} memory/memory.c
 
 idt.o: idt/idt.c
-	gcc -mcmodel=large -fno-builtin -m64 -c idt/idt.c
+	gcc ${CFLAGS} idt/idt.c
 
 apic.o: apic/apic.c
-	gcc -mcmodel=large -fno-builtin -m64 -c apic/apic.c
+	gcc ${CFLAGS} apic/apic.c
 
 .PHONY : clean
 clean:
 	-rm -f *.o *.p
+

@@ -23,6 +23,14 @@ long phy_to_virt(long n) {
     return BASE_ADDRESS + n;
 }
 
-long get_gdt() {
-    return GDT_Table;
+long long get_gdt() {
+    long long *n = (long long *)malloc(10);
+
+    asm (
+    "sgdt %[result];"
+    :[result] "=m"(*n) // 输出项（必须带=）
+    :
+    : "memory");
+
+    return *n;
 }
